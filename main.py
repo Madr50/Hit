@@ -94,7 +94,6 @@ class HotmailSupercellChecker:
   self.session.verify=False
  def load_combo(self,combo_file):
   if not os.path.exists(combo_file):
-   print(f"{Z}[Combo file not found: {combo_file}]{M}")
    return[]
   combos=[]
   with open(combo_file,'r',encoding='utf-8',errors='ignore')as f:
@@ -274,36 +273,46 @@ class HotmailSupercellChecker:
 def main():
     checker = HotmailSupercellChecker()
     
-    # Check if files are passed as arguments
     if len(sys.argv) > 1:
         combo_files = []
         for arg in sys.argv[1:]:
-            # Support both "hot19.txt" and "hot19" or even just "19"
-            if os.path.exists(arg):
-                combo_files.append(arg)
-            elif os.path.exists(f"{arg}.txt"):
-                combo_files.append(f"{arg}.txt")
-            elif os.path.exists(f"hot{arg}.txt"):
-                combo_files.append(f"hot{arg}.txt")
-            else:
+            # Clean argument (remove .txt if present to normalize)
+            clean_arg = arg.replace(".txt", "")
+            # Try to find the file in multiple ways
+            possible_names = [
+                arg, 
+                f"{arg}.txt",
+                f"hot{clean_arg}.txt",
+                f"hit{clean_arg}.txt",
+                clean_arg.replace("hit", "hot") + ".txt",
+                clean_arg.replace("hot", "hit") + ".txt"
+            ]
+            
+            found = False
+            for name in possible_names:
+                if os.path.exists(name):
+                    combo_files.append(name)
+                    found = True
+                    break
+            
+            if not found:
                 print(f"{Z}File not found: {arg}{M}")
     else:
-        # Default behavior: search for all hot*.txt files
         from pathlib import Path
         base_dir = Path(".")
         combo_files = sorted(
             str(f) for f in base_dir.iterdir()
-            if f.is_file() and f.name.startswith("hot") and f.suffix == ".txt"
+            if f.is_file() and (f.name.startswith("hot") or f.name.startswith("hit")) and f.suffix == ".txt"
         )
 
     if not combo_files:
         print(f"{Z}No combo files to process.{M}")
         return
 
-    os.system("clear")
+    # Removed os.system("clear") to keep logs visible
     try:
         for combo_file in combo_files:
-            print(f"{X}Processing: {combo_file}{M}")
+            print(f"\n{X}Processing: {combo_file}{M}")
             checker.run_checker(combo_file)
     except KeyboardInterrupt:
         print("\nInterrupted by user.")

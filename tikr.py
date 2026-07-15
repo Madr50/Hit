@@ -476,37 +476,36 @@ try:
 			usery=str("".join(random.choice(user)for i in range(rng)))
 			url = f'https://www.tiktok.com/api/search/user/full/?aid=1988&app_language=ar&app_name=tiktok_web&battery_info=1&browser_language=ar-AE&browser_name=Mozilla&browser_online=true&browser_platform=Win32&browser_version=5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36&channel=tiktok_web&cookie_enabled=true&cursor=20&device_id=7151371875721430533&device_platform=web_pc&focus_state=true&from_page=search&history_len=20&is_fullscreen=false&is_page_visible=true&keyword={usery}&os=windows&priority_region=&referer=&region=IQ&root_referer=https://www.google.com/&screen_height=1024&screen_width=1280&tz_name=Asia/Baghdad&webcast_language=ar'
 			he = {
-	'accept': '*/*',
-	'cookie':
-	f'ttwid={ttwid};msToken={msToken}',
-	'referer': 'https://www.tiktok.com/',
-	'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
-	'sec-ch-ua-mobile': '?0',
-	'sec-ch-ua-platform': '"Windows"',
-	'sec-fetch-dest': 'empty',
-	'sec-fetch-mode': 'cors',
-	'sec-fetch-site': 'same-origin',
-	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-		}
-				try:
-					response = requests.get(url, headers=he, timeout=10)
-					if response.status_code != 200:
-						print(f"{X} Status Code: {response.status_code} - Retrying...")
-						continue
-					rr = response.json()
-					za=0
-					try:
-					     while True:
-					     	email = rr['user_list'][za]['user_info']['unique_id']
-					     	email = email+'@gmail.com'
-					     	check(email)
-					     	za += 1
-					except (IndexError, KeyError):
-						continue
-				except Exception as e:
-					print(f"{Z} Error: {e} - Retrying...")
-					time.sleep(2)
+				'accept': '*/*',
+				'cookie': f'ttwid={ttwid};msToken={msToken}',
+				'referer': 'https://www.tiktok.com/',
+				'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
+				'sec-ch-ua-mobile': '?0',
+				'sec-ch-ua-platform': '"Windows"',
+				'sec-fetch-dest': 'empty',
+				'sec-fetch-mode': 'cors',
+				'sec-fetch-site': 'same-origin',
+				'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+			}
+			try:
+				response = requests.get(url, headers=he, timeout=10)
+				if response.status_code != 200:
+					print(f"{X} Status Code: {response.status_code} - Retrying...")
 					continue
+				rr = response.json()
+				za=0
+				try:
+					while True:
+						email = rr['user_list'][za]['user_info']['unique_id']
+						email = email+'@gmail.com'
+						check(email)
+						za += 1
+				except (IndexError, KeyError):
+					continue
+			except Exception as e:
+				print(f"{Z} Error: {e} - Retrying...")
+				time.sleep(2)
+				continue
 	
 
 except requests.exceptions.ConnectionError or ConnectionError:
@@ -519,7 +518,7 @@ except NameError:
 	print(F+ 'حاول مره اخرى ┐( ˘_˘)┌ ')
 	
 	
-def zaiduser():
+	def zaiduser():
 		while True:
 			user='qwertyuioplkjhgfdsazxcvbnm'
 			num='456789'
@@ -527,35 +526,34 @@ def zaiduser():
 			usery=str("".join(random.choice(user)for i in range(rng)))
 			url = f'https://www.tiktok.com/api/search/user/full/?aid=1988&app_language=ar&app_name=tiktok_web&battery_info=0.49&browser_language=ar-IQ&browser_name=Mozilla&browser_online=true&browser_platform=Linux%20aarch64&browser_version=5.0%20%28X11%3B%20Linux%20x86_64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F107.0.0.0%20Safari%2F537.36&channel=tiktok_web&cookie_enabled=true&cursor=0&device_id=7158554480757474821&device_platform=web_pc&focus_state=true&from_page=search&history_len=20&is_fullscreen=false&is_page_visible=true&keyword={usery}&os=linux&priority_region=IQ&referer=&region=IQ&screen_height=796&screen_width=360&tz_name=Asia%2FBaghdad&webcast_language=ar&msToken=quoDdZKFvCnYtrf-KneY5GixRDNaT_XDstyjsiGkm43oA9UhMwEvQ_eiU_6GCZDPb6lu-iczq5_-lsqcfhaPFtVMHZTFujiFXxOCw9ShSsv8gvqdnbCOVZH8wJvGQSsJ3TTguOX-O-oVL3vaF8rr&X-Bogus=DFSzswVLeGGANrnNS0rUG5xPBxhv&_signature=_02B4Z6wo00001qrk1hwAAIDDaTvJqvq.SjKq5NKAAMnd00'
 			he = {
-	'accept': '*/*',
-	'cookie':
-	f'ttwid={ttwid};msToken={msToken}',
-	'referer': 'https://www.tiktok.com/',
-	'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
-	'sec-ch-ua-mobile': '?0',
-	'sec-ch-ua-platform': '"Windows"',
-	'sec-fetch-dest': 'empty',
-	'sec-fetch-mode': 'cors',
-	'sec-fetch-site': 'same-origin',
-	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-		}
-				try:
-					response = requests.get(url, headers=he, timeout=10)
-					if response.status_code != 200:
-						continue
-					rr = response.json()
-					za=0
-					try:
-					     while True:
-					     	email = rr['user_list'][za]['user_info']['unique_id']
-					     	email = email+'@gmail.com'
-					     	check(email)
-					     	za += 1
-					except (IndexError, KeyError):
-						continue
-				except Exception:
-					time.sleep(2)
+				'accept': '*/*',
+				'cookie': f'ttwid={ttwid};msToken={msToken}',
+				'referer': 'https://www.tiktok.com/',
+				'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
+				'sec-ch-ua-mobile': '?0',
+				'sec-ch-ua-platform': '"Windows"',
+				'sec-fetch-dest': 'empty',
+				'sec-fetch-mode': 'cors',
+				'sec-fetch-site': 'same-origin',
+				'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+			}
+			try:
+				response = requests.get(url, headers=he, timeout=10)
+				if response.status_code != 200:
 					continue
+				rr = response.json()
+				za=0
+				try:
+					while True:
+						email = rr['user_list'][za]['user_info']['unique_id']
+						email = email+'@gmail.com'
+						check(email)
+						za += 1
+				except (IndexError, KeyError):
+					continue
+			except Exception:
+				time.sleep(2)
+				continue
 	
 
 def zaid20():
@@ -711,44 +709,42 @@ def check99(email):
  	print(f' {S}Error Email Tik : {email}')
 
 
-def zzookore():		
-	#print(rr)
-	
+	def zzookore():
 		user='qwertyuiopasd_fghjklzxcvbnm'
 		num='456789'
 		rng=int("".join(random.choice(num)for i in range(1)))
 		usery=str("".join(random.choice(user)for i in range(rng)))
 		url = f'https://www.tiktok.com/api/search/user/full/?aid=1988&app_language=ar&app_name=tiktok_web&battery_info=0.49&browser_language=ar-IQ&browser_name=Mozilla&browser_online=true&browser_platform=Linux%20aarch64&browser_version=5.0%20%28X11%3B%20Linux%20x86_64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20Chrome%2F107.0.0.0%20Safari%2F537.36&channel=tiktok_web&cookie_enabled=true&cursor=0&device_id=7158554480757474821&device_platform=web_pc&focus_state=true&from_page=search&history_len=20&is_fullscreen=false&is_page_visible=true&keyword={usery}&os=linux&priority_region=IQ&referer=&region=IQ&screen_height=796&screen_width=360&tz_name=Asia%2FBaghdad&webcast_language=ar&msToken=quoDdZKFvCnYtrf-KneY5GixRDNaT_XDstyjsiGkm43oA9UhMwEvQ_eiU_6GCZDPb6lu-iczq5_-lsqcfhaPFtVMHZTFujiFXxOCw9ShSsv8gvqdnbCOVZH8wJvGQSsJ3TTguOX-O-oVL3vaF8rr&X-Bogus=DFSzswVLeGGANrnNS0rUG5xPBxhv&_signature=_02B4Z6wo00001qrk1hwAAIDDaTvJqvq.SjKq5NKAAMnd00'
 		he = {
-	'accept': '*/*',
-	'cookie':
-	f'ttwid={ttwid};msToken={msToken}',
-	'referer': 'https://www.tiktok.com/',
-	'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
-	'sec-ch-ua-mobile': '?0',
-	'sec-ch-ua-platform': '"Windows"',
-	'sec-fetch-dest': 'empty',
-	'sec-fetch-mode': 'cors',
-	'sec-fetch-site': 'same-origin',
-	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'}
-			try:
-				response = requests.get(url, headers=he, timeout=10)
-				if response.status_code != 200:
-					zzookore()
-					return
-				rr = response.json()
-				za=0
-				try:
-				     while True:
-				     	email = rr['user_list'][za]['user_info']['unique_id']
-				     	email = email+'@yahoo.com'
-				     	check(email)
-				     	za += 1
-				except (IndexError, KeyError):
-					zzookore()
-			except Exception:
-				time.sleep(2)
+			'accept': '*/*',
+			'cookie': f'ttwid={ttwid};msToken={msToken}',
+			'referer': 'https://www.tiktok.com/',
+			'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
+			'sec-ch-ua-mobile': '?0',
+			'sec-ch-ua-platform': '"Windows"',
+			'sec-fetch-dest': 'empty',
+			'sec-fetch-mode': 'cors',
+			'sec-fetch-site': 'same-origin',
+			'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+		}
+		try:
+			response = requests.get(url, headers=he, timeout=10)
+			if response.status_code != 200:
 				zzookore()
+				return
+			rr = response.json()
+			za=0
+			try:
+				while True:
+					email = rr['user_list'][za]['user_info']['unique_id']
+					email = email+'@yahoo.com'
+					check(email)
+					za += 1
+			except (IndexError, KeyError):
+				zzookore()
+		except Exception:
+			time.sleep(2)
+			zzookore()
 
 
 

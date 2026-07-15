@@ -488,17 +488,25 @@ try:
 	'sec-fetch-site': 'same-origin',
 	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
 		}
-			rr = requests.get(url,headers=he).json()
-			za=0
-			try:
-			     while True:
-			     	za += 1
-			     	email = rr['user_list'][za]['user_info']['unique_id']
-			     	email = email+'@gmail.com'
-			     	check(email)
-					
-			except IndexError:
-				zaid16()	
+				try:
+					response = requests.get(url, headers=he, timeout=10)
+					if response.status_code != 200:
+						print(f"{X} Status Code: {response.status_code} - Retrying...")
+						continue
+					rr = response.json()
+					za=0
+					try:
+					     while True:
+					     	email = rr['user_list'][za]['user_info']['unique_id']
+					     	email = email+'@gmail.com'
+					     	check(email)
+					     	za += 1
+					except (IndexError, KeyError):
+						continue
+				except Exception as e:
+					print(f"{Z} Error: {e} - Retrying...")
+					time.sleep(2)
+					continue
 	
 
 except requests.exceptions.ConnectionError or ConnectionError:
@@ -531,17 +539,23 @@ def zaiduser():
 	'sec-fetch-site': 'same-origin',
 	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
 		}
-			rr = requests.get(url,headers=he).json()
-			za=0
-			try:
-			     while True:
-			     	za += 1
-			     	email = rr['user_list'][za]['user_info']['unique_id']
-			     	email = email+'@gmail.com'
-			     	check(email)
-					
-			except IndexError:
-				zaiduser()	
+				try:
+					response = requests.get(url, headers=he, timeout=10)
+					if response.status_code != 200:
+						continue
+					rr = response.json()
+					za=0
+					try:
+					     while True:
+					     	email = rr['user_list'][za]['user_info']['unique_id']
+					     	email = email+'@gmail.com'
+					     	check(email)
+					     	za += 1
+					except (IndexError, KeyError):
+						continue
+				except Exception:
+					time.sleep(2)
+					continue
 	
 
 def zaid20():
@@ -717,17 +731,24 @@ def zzookore():
 	'sec-fetch-mode': 'cors',
 	'sec-fetch-site': 'same-origin',
 	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'}
-		rr = requests.get(url,headers=he).json()
-		za=0
-		try:
-			while True:
-				za += 1
-				email = rr['user_list'][za]['user_info']['unique_id']
-				email = email+'@yahoo.com'
-				check99(email)
-				
-		except IndexError:
-			zzookore()
+			try:
+				response = requests.get(url, headers=he, timeout=10)
+				if response.status_code != 200:
+					zzookore()
+					return
+				rr = response.json()
+				za=0
+				try:
+				     while True:
+				     	email = rr['user_list'][za]['user_info']['unique_id']
+				     	email = email+'@yahoo.com'
+				     	check(email)
+				     	za += 1
+				except (IndexError, KeyError):
+					zzookore()
+			except Exception:
+				time.sleep(2)
+				zzookore()
 
 
 

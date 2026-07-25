@@ -4,17 +4,20 @@ from telethon import TelegramClient, events
 from github import Github
 
 # ==========================================
-# الإعدادات الخاصة بك (جاهزة)
+# الإعدادات الخاصة بك (جاهزة 100%)
 # ==========================================
 API_ID = 24044141          
 API_HASH = '3de21516f69614b183a96dbf1846aae5'
 CHANNEL_ID = -1002967179524 # آيدي قناة H o t m a i l
 
-GITHUB_TOKEN = 'توكن_قيت_هب_تبعك' # بس غير هاي!
+GITHUB_TOKEN = 'Ghp_vKDVKQhbWUtqqHVbAljub9bPfHri090zVNEL' # التوكن تبعك
 REPO_NAME = 'Madr50/Hit'
 
 # العداد يبدأ من الملف الأخير اللي وصلته (مثلا 2000)
 file_counter = 2000
+
+# عشان ما نرفع نفس الملف مرتين
+uploaded_files = set()
 
 client = TelegramClient('my_session', API_ID, API_HASH)
 gh = Github(GITHUB_TOKEN)
@@ -39,8 +42,11 @@ def get_gofile_direct_link(gofile_url):
         print(f"❌ خطأ في استخراج رابط Gofile: {e}")
     return None
 
-@client.on(events.NewMessage(chats=CHANNEL_ID))
-async def download_new_combos(event):
+async def process_message(event):
+    """
+    بتعالج رسالة واحدة (قديمة أو جديدة).
+    بترفع الملف لـ GitHub لو لقت زر GoFile.
+    """
     global file_counter
     
     # فحص إذا البوست يحتوي على أزرار تفاعلية
@@ -49,14 +55,25 @@ async def download_new_combos(event):
             for button in row:
                 # البحث عن الزر اللي فيه رابط
                 if button.url and "gofile.io" in button.url:
-                    print(f"🔗 لقيت رابط GoFile جديد: {button.url}")
+                    
+                    # ✅ تخطي لو الرابط نفسه تم رفعه قبل
+                    if button.url in uploaded_files:
+                        print(f"⏭️ تم تخطي (مُرفع سابقاً): {button.url}")
+                        continue
+                    
+                    print(f"🔗 لقيت رابط GoFile: {button.url}")
                     
                     # 1. جلب الرابط المباشر للتحميل من جوفايل
                     direct_link = get_gofile_direct_link(button.url)
                     
                     if direct_link:
                         print(f"⬇️ جاري تحميل الملف...")
-                        file_res = requests.get(direct_link)
+                        try:
+                            file_res = requests.get(direct_link, timeout=120)
+                            file_res.raise_for_status()
+                        except Exception as e:
+                            print(f"❌ فشل التحميل: {e}")
+                            continue
                         
                         file_name = f"hot{file_counter}.txt"
                         
@@ -65,21 +82,61 @@ async def download_new_combos(event):
                             f.write(file_res.content)
                             
                         # 3. قراءة المحتوى ورفعه على GitHub
-                        with open(file_name, 'r', encoding='utf-8', errors='ignore') as f:
-                            content = f.read()
+                        try:
+                            with open(file_name, 'r', encoding='utf-8', errors='ignore') as f:
+                                content = f.read()
+                                
+                            repo.create_file(file_name, f"Auto upload {file_name}", content)
+                            print(f"✅ تم رفع {file_name} بنجاح إلى GitHub!")
                             
-                        repo.create_file(file_name, f"Auto upload {file_name}", content)
-                        print(f"✅ تم رفع {file_name} بنجاح إلى GitHub!")
-                        
-                        # 4. تنظيف الجهاز وحذف الملف المحلي
-                        os.remove(file_name)
-                        
-                        # 5. زيادة العداد للملف التالي
-                        file_counter += 1
+                            # سجل الرابط عشان ما يتكرر
+                            uploaded_files.add(button.url)
+                            
+                            # 4. زيادة العداد للملف التالي
+                            file_counter += 1
+                            
+                        except Exception as e:
+                            print(f"❌ خطأ برفع الملف لـ GitHub: {e}")
+                        finally:
+                            # 5. تنظيف الجهاز وحذف الملف المحلي
+                            if os.path.exists(file_name):
+                                os.remove(file_name)
                     else:
                         print("⚠️ ما قدرت أطلع رابط التحميل المباشر من صفحة Gofile")
 
-print("🤖 البوت شغال الآن وقاعد يراقب القناة سكيّتي... ارتاح والسيستم شغال!")
-client.start()
-client.run_until_disconnected()
+async def download_old_messages():
+    """
+    بتجيب كل الرسايل القديمة من القناة وتعالجها.
+    """
+    print("📜 جاري جلب الرسايل القديمة من القناة...")
+    msg_count = 0
+    
+    # limit=None يعني كل الرسايل الموجودة بالقناة
+    # لو القناة كبيرة جداً ممكن تستبدلها برقم مثل limit=5000
+    async for message in client.iter_messages(CHANNEL_ID, limit=None):
+        if message.buttons:
+            await process_message(message)
+            msg_count += 1
+    
+    print(f"🏁 خلصنا من {msg_count} رسالة قديمة. الآن بننتقل للمراقبة الحية...")
 
+@client.on(events.NewMessage(chats=CHANNEL_ID))
+async def download_new_combos(event):
+    """
+    المراقبة الحية للرسايل الجديدة.
+    """
+    await process_message(event)
+
+# ==========================================
+# التشغيل
+# ==========================================
+print("🤖 البوت شغال الآن...")
+
+client.start()
+
+# شغل جلب القديم أولاً (بشكل متزامن مع await)
+client.loop.run_until_complete(download_old_messages())
+
+# بعد ما يخلص القديم، يضل شغال على المراقبة الحية
+print("👁️ الآن قاعد يراقب القناة للرسايل الجديدة... بتقدر تروح ترتاح!")
+client.run_until_disconnected()

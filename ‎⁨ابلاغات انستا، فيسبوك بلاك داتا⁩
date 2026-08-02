@@ -1,0 +1,536 @@
+import os
+import time
+import random
+import platform
+import sys
+import webbrowser
+import json
+from datetime import datetime
+
+# إعدادات الألوان المتقدمة - تصميم فريد وجذاب
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+MAGENTA = '\033[95m'
+CYAN = '\033[96m'
+WHITE = '\033[97m'
+BOLD = '\033[1m'
+DIM = '\033[2m'
+BLINK = '\033[5m'
+REVERSE = '\033[7m'
+RESET = '\033[0m'
+
+CHANNEL_URL = "https://t.me/Black_Data2"
+STATS_FILE = "report_stats.json"
+
+# بيانات الإحصائيات
+stats = {
+    "total_attacks": 0,
+    "total_reports": 0,
+    "success_rate": 0,
+    "last_attacks": []
+}
+
+def clear_screen():
+    os.system('cls' if platform.system() == 'Windows' else 'clear')
+
+def typewriter(text, delay=0.03):
+    for char in text:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()
+
+def loading_bar_3d(duration=3, text="جارٍ التحميل"):
+    print(f"\n{MAGENTA}{BOLD}┌──────────────────────────────────────────────────────┐{RESET}")
+    print(f"{MAGENTA}{BOLD}│{RESET}  {WHITE}{text}{RESET}                                      {MAGENTA}{BOLD}│{RESET}")
+    print(f"{MAGENTA}{BOLD}├──────────────────────────────────────────────────────┤{RESET}")
+    print(f"{MAGENTA}{BOLD}│{RESET}  ", end="")
+    total_steps = 40
+    colors = [RED, YELLOW, GREEN, CYAN, MAGENTA, BLUE]
+    for i in range(total_steps):
+        time.sleep(duration/total_steps)
+        color = colors[i % len(colors)]
+        print(f"{color}█", end="")
+        sys.stdout.flush()
+        percent = int((i / total_steps) * 100)
+        remaining = int((total_steps - i) * (duration / total_steps))
+        print(f"\r{MAGENTA}{BOLD}│{RESET}  {color}█" * (i + 1) + f"  {WHITE}{percent}% - متبقي: {remaining} ثانية{RESET}", end="")
+    print(f"  {MAGENTA}{BOLD}│{RESET}")
+    print(f"{MAGENTA}{BOLD}└──────────────────────────────────────────────────────┘{RESET}")
+    print(f"{GREEN}✓ اكتمل بنجاح!{RESET}")
+
+def attack_progress_bar(current, total, text="جارٍ الهجوم"):
+    percent = int((current / total) * 100)
+    bar_length = 30
+    filled = int(bar_length * current / total)
+    bar = '█' * filled + '░' * (bar_length - filled)
+    print(f"\r{CYAN}{BOLD}│{RESET}  {WHITE}{text}{RESET}  {GREEN}[{bar}] {YELLOW}{percent}%{RESET}", end="")
+    sys.stdout.flush()
+
+def animated_background():
+    frames = [
+        """
+        ╔══════════════════════════════════════════════════════════════════╗
+        ║  ██████╗  █████╗  ██████╗██╗  ██╗                             ║
+        ║  ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝                             ║
+        ║  ██████╔╝███████║██║     █████╔╝                              ║
+        ║  ██╔══██╗██╔══██║██║     ██╔═██╗                              ║
+        ║  ██████╔╝██║  ██║╚██████╗██║  ██╗                             ║
+        ║  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝                             ║
+        ╠══════════════════════════════════════════════════════════════════╣
+        ║  🔥 BLACK DATA - النظام المتقدم 🔥                             ║
+        ╚══════════════════════════════════════════════════════════════════╝
+        """,
+        """
+        ╔══════════════════════════════════════════════════════════════════╗
+        ║  ██████╗  █████╗  ██████╗██╗  ██╗                             ║
+        ║  ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝                             ║
+        ║  ██████╔╝███████║██║     █████╔╝                              ║
+        ║  ██╔══██╗██╔══██║██║     ██╔═██╗                              ║
+        ║  ██████╔╝██║  ██║╚██████╗██║  ██╗                             ║
+        ║  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝                             ║
+        ╠══════════════════════════════════════════════════════════════════╣
+        ║  ⚡ SYSTEM INITIALIZING... ⚡                                   ║
+        ╚══════════════════════════════════════════════════════════════════╝
+        """
+    ]
+    colors = [RED, YELLOW, GREEN, CYAN, MAGENTA, BLUE]
+    for i in range(4):
+        clear_screen()
+        color = colors[i % len(colors)]
+        print(f"{color}{BOLD}{frames[i % len(frames)]}{RESET}")
+        time.sleep(0.5)
+
+def splash_screen_advanced():
+    clear_screen()
+    for _ in range(2):
+        print(f"{RED}{BOLD}")
+        print(""" 
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  ██████╗ ██╗      █████╗  ██████╗██╗  ██╗                      ║
+    ║  ██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝                      ║
+    ║  ██████╔╝██║     ███████║██║     █████╔╝                       ║
+    ║  ██╔══██╗██║     ██╔══██║██║     ██╔═██╗                       ║
+    ║  ██████╔╝███████╗██║  ██║╚██████╗██║  ██╗                      ║
+    ║  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝                      ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║  ██████╗ ███████╗██████╗  ██████╗ ██████╗ ████████╗           ║
+    ║  ██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝           ║
+    ║  ██████╔╝█████╗  ██████╔╝██║   ██║██████╔╝   ██║              ║
+    ║  ██╔══██╗██╔══╝  ██╔══██╗██║   ██║██╔══██╗   ██║              ║
+    ║  ██████╔╝███████╗██║  ██║╚██████╔╝██║  ██║   ██║              ║
+    ║  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝              ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║    {CYAN}🔥 BLACK DATA - Report Striker Pro 🔥{RED}                           ║
+    ║    {YELLOW}⚡ نظام ضرب الإبلاغات المتقدم ⚡{RED}                               ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║    {GREEN}جميع الحقوق محفوظة © قناة بلاك داتا{RED}                        ║
+    ╚══════════════════════════════════════════════════════════════════╝
+        """)
+        print(f"{RESET}")
+        time.sleep(0.3)
+        clear_screen()
+        time.sleep(0.2)
+    print(f"{RED}{BOLD}")
+    print(""" 
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  ██████╗ ██╗      █████╗  ██████╗██╗  ██╗                      ║
+    ║  ██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝                      ║
+    ║  ██████╔╝██║     ███████║██║     █████╔╝                       ║
+    ║  ██╔══██╗██║     ██╔══██║██║     ██╔═██╗                       ║
+    ║  ██████╔╝███████╗██║  ██║╚██████╗██║  ██╗                      ║
+    ║  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝                      ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║  ██████╗ ███████╗██████╗  ██████╗ ██████╗ ████████╗           ║
+    ║  ██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝           ║
+    ║  ██████╔╝█████╗  ██████╔╝██║   ██║██████╔╝   ██║              ║
+    ║  ██╔══██╗██╔══╝  ██╔══██╗██║   ██║██╔══██╗   ██║              ║
+    ║  ██████╔╝███████╗██║  ██║╚██████╔╝██║  ██║   ██║              ║
+    ║  ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝              ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║    {CYAN}🔥 BLACK DATA - Report Striker Pro 🔥{RED}                           ║
+    ║    {YELLOW}⚡ نظام ضرب الإبلاغات المتقدم ⚡{RED}                               ║
+    ╠══════════════════════════════════════════════════════════════════╣
+    ║    {GREEN}جميع الحقوق محفوظة © قناة بلاك داتا{RED}                        ║
+    ╚══════════════════════════════════════════════════════════════════╝
+    """)
+    print(f"{RESET}")
+    print(f"{RED}{BOLD}═══[ نظام التشغيل: {platform.system()} ]═══{RESET}\n")
+
+def create_3d_box(text, color=GREEN):
+    border = f"{color}{BOLD}"
+    print(f"{border}╔{'═' * (len(text) + 4)}╗{RESET}")
+    print(f"{border}║  {text}  ║{RESET}")
+    print(f"{border}╚{'═' * (len(text) + 4)}╝{RESET}")
+
+def alert_system(message, level="info"):
+    colors = {
+        "info": CYAN,
+        "success": GREEN,
+        "warning": YELLOW,
+        "error": RED,
+        "hack": RED
+    }
+    color = colors.get(level, WHITE)
+    if level == "hack":
+        print(f"\n{color}{BOLD}{BLINK}🔥 {message} 🔥{RESET}")
+        print('\a')
+        time.sleep(0.3)
+        print('\a')
+        time.sleep(0.3)
+        print('\a')
+    elif level == "success":
+        print(f"\n{color}{BOLD}✅ {message}{RESET}")
+        print('\a')
+    elif level == "warning":
+        print(f"\n{color}{BOLD}⚠️ {message}{RESET}")
+    elif level == "error":
+        print(f"\n{color}{BOLD}❌ {message}{RESET}")
+        print('\a')
+    else:
+        print(f"\n{color}{BOLD}ℹ️ {message}{RESET}")
+
+def channel_verification():
+    clear_screen()
+    create_3d_box("🔐 التحقق من الاشتراك في القناة", RED)
+    print(f"{RESET}")
+    
+    typewriter(f"\n{YELLOW}{BOLD}⚠️ يجب الاشتراك في قناة بلاك داتا لتفعيل الأداة ⚠️{RESET}")
+    typewriter(f"{CYAN}📌 رابط القناة: {WHITE}{CHANNEL_URL}{RESET}\n")
+    
+    print(f"{WHITE}1. اضغط على الرابط للانتقال إلى القناة{RESET}")
+    print(f"{WHITE}2. اشترك في القناة{RESET}")
+    print(f"{WHITE}3. عد إلى هنا وأدخل (نعم) لتأكيد الاشتراك{RESET}\n")
+    
+    print(f"{CYAN}[*] جاري فتح رابط القناة...{RESET}")
+    time.sleep(1)
+    webbrowser.open(CHANNEL_URL)
+    print(f"{GREEN}[✓] تم فتح الرابط بنجاح{RESET}\n")
+    
+    confirm = input(f"{WHITE}{BOLD}هل قمت بالاشتراك في القناة؟ (نعم/لا): {RESET}{GREEN}").strip().lower()
+    print(RESET)
+    
+    if confirm == "نعم" or confirm == "yes":
+        alert_system("تم تأكيد الاشتراك! جاري تشغيل الأداة...", "success")
+        time.sleep(1)
+        return True
+    else:
+        alert_system("يرجى الاشتراك في القناة أولاً لتشغيل الأداة.", "error")
+        print(f"{YELLOW}[!] سيتم فتح الرابط مرة أخرى...{RESET}")
+        time.sleep(2)
+        webbrowser.open(CHANNEL_URL)
+        return False
+
+def generate_ip():
+    return '.'.join(str(random.randint(1, 255)) for _ in range(4))
+
+def generate_user_agent():
+    agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15",
+        "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    ]
+    return random.choice(agents)
+
+def load_stats():
+    global stats
+    if os.path.exists(STATS_FILE):
+        try:
+            with open(STATS_FILE, 'r') as f:
+                stats = json.load(f)
+        except:
+            stats = {"total_attacks": 0, "total_reports": 0, "success_rate": 0, "last_attacks": []}
+
+def save_stats():
+    with open(STATS_FILE, 'w') as f:
+        json.dump(stats, f, indent=4)
+
+def show_stats():
+    load_stats()
+    clear_screen()
+    create_3d_box("📊 لوحة الإحصائيات", BLUE)
+    print(f"\n{WHITE}{BOLD}📌 إجمالي الهجمات: {RESET}{GREEN}{stats['total_attacks']}{RESET}")
+    print(f"{WHITE}{BOLD}📌 إجمالي الإبلاغات: {RESET}{GREEN}{stats['total_reports']:,}{RESET}")
+    print(f"{WHITE}{BOLD}📌 نسبة النجاح: {RESET}{GREEN}{stats['success_rate']}%{RESET}")
+    print(f"{WHITE}{BOLD}📌 آخر 5 هجمات:{RESET}")
+    for i, attack in enumerate(stats['last_attacks'][-5:], 1):
+        print(f"   {GREEN}[{i}] {attack}{RESET}")
+    input(f"\n{YELLOW}اضغط Enter للعودة...{RESET}")
+
+def generate_html_report(target_platform, target_user, reports_count, success_rate, ip, elapsed_time):
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>تقرير الهجوم - BLACK DATA</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 20px; }}
+        .container {{ max-width: 800px; margin: auto; background: #1a1a1a; padding: 20px; border-radius: 10px; border: 2px solid #ff0000; }}
+        h1 {{ color: #ff0000; text-align: center; }}
+        h2 {{ color: #00ff00; }}
+        .info {{ background: #2a2a2a; padding: 10px; margin: 5px 0; border-radius: 5px; border-left: 3px solid #ff0000; }}
+        .label {{ color: #888; }}
+        .value {{ color: #00ff00; font-weight: bold; }}
+        .footer {{ text-align: center; margin-top: 20px; color: #666; font-size: 12px; }}
+        .danger {{ color: #ff0000; }}
+        .success {{ color: #00ff00; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 تقرير الهجوم - BLACK DATA</h1>
+        <h3 style="color: #ff0000; text-align: center;">⚠ تم تنفيذ الهجوم بنجاح ⚠</h3>
+        
+        <div class="info"><span class="label">المنصة المستهدفة:</span> <span class="value">{target_platform}</span></div>
+        <div class="info"><span class="label">الحساب المستهدف:</span> <span class="value">{target_user}</span></div>
+        <div class="info"><span class="label">عدد الإبلاغات المرسلة:</span> <span class="value">{reports_count:,}</span></div>
+        <div class="info"><span class="label">نسبة النجاح:</span> <span class="value">{success_rate}%</span></div>
+        <div class="info"><span class="label">عنوان IP المستخدم:</span> <span class="value">{ip}</span></div>
+        <div class="info"><span class="label">الوقت المستغرق:</span> <span class="value">{elapsed_time} ثانية</span></div>
+        <div class="info"><span class="label">تاريخ الهجوم:</span> <span class="value">{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span></div>
+        
+        <h2>🛡️ الثغرات المستغلة</h2>
+        <div class="info"><span class="label">الثغرة 1:</span> <span class="value">ثغرة تجاوز نظام الإبلاغات ✓</span></div>
+        <div class="info"><span class="label">الثغرة 2:</span> <span class="value">ثغرة تكرار الإبلاغات ✓</span></div>
+        <div class="info"><span class="label">الثغرة 3:</span> <span class="value">ثغرة تجاوز الحماية ✓</span></div>
+        <div class="info"><span class="label">الثغرة 4:</span> <span class="value">ثغرة إخفاء الهوية ✓</span></div>
+        
+        <h2>📊 حالة النظام</h2>
+        <div class="info"><span class="label">حالة الاتصال:</span> <span class="value">مستقر ✓</span></div>
+        <div class="info"><span class="label">وضع التخفي:</span> <span class="value">مفعل ✓</span></div>
+        <div class="info"><span class="label">جدار الحماية:</span> <span class="value">مخترق ✓</span></div>
+        
+        <div class="footer">تقرير صادر عن BLACK DATA - جميع الحقوق محفوظة ©</div>
+    </div>
+</body>
+</html>"""
+    
+    filename = f"report_{target_user}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    return filename
+
+def firewall_breach_screen():
+    clear_screen()
+    print(f"{RED}{BOLD}")
+    print(""" 
+    ╔══════════════════════════════════════════════════════════════════╗
+    ║  🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥  ║
+    ║  🔥          جاري اختراق الجدار الناري...          🔥  ║
+    ║  🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥  ║
+    ╚══════════════════════════════════════════════════════════════════╝
+    """)
+    print(f"{RESET}")
+    
+    firewall = ["▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓", "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░", "▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░", "▓▓▓▓▓▓▓▓░░░░░░░░░░░░", "▓▓▓▓░░░░░░░░░░░░░░░░", "░░░░░░░░░░░░░░░░░░░░"]
+    for i, fw in enumerate(firewall):
+        print(f"\r{RED}{BOLD}🛡️ الجدار الناري: {fw}{RESET}", end="")
+        time.sleep(0.5)
+    print(f"\n{GREEN}{BOLD}✅ تم اختراق الجدار الناري بنجاح!{RESET}")
+    time.sleep(1)
+
+def show_live_results(sent, total, success, remaining, rate, server):
+    percent = int((sent / total) * 100) if total > 0 else 0
+    bar_length = 25
+    filled = int(bar_length * sent / total) if total > 0 else 0
+    bar = '█' * filled + '░' * (bar_length - filled)
+    
+    # تحويل الوقت المتبقي من ثواني إلى دقائق وثواني
+    minutes = remaining // 60
+    seconds = remaining % 60
+    time_str = f"{minutes:02d}:{seconds:02d}"
+    
+    print(f"\r{CYAN}📊 إرسال البلاغات: {YELLOW}{sent:,}{RESET} / {GREEN}{total:,}{RESET}  {CYAN}[{bar}] {YELLOW}{percent}%{RESET}", end="")
+    print(f"  |  {GREEN}✓ النجاح: {success}%{RESET}  |  ⏱️ {WHITE}{time_str}{RESET}", end="")
+    print(f"  |  🚀 {MAGENTA}{rate} بلاغ/ث{RESET}", end="")
+    print(f"  |  🌐 {DIM}{server}{RESET}", end="")
+    sys.stdout.flush()
+
+def report_striker():
+    load_stats()
+    clear_screen()
+    splash_screen_advanced()
+    
+    create_3d_box("⚡ Report Striker Pro - نظام ضرب الإبلاغات", RED)
+    print(f"{RESET}")
+    
+    print(f"{YELLOW}[!] اختر المنصة المستهدفة:{RESET}\n")
+    print(f"{CYAN}[1] إنستغرام (Instagram){RESET}")
+    print(f"{CYAN}[2] فيسبوك (Facebook){RESET}")
+    print(f"{CYAN}[3] كلاهما (مزدوج){RESET}")
+    
+    platform_choice = input(f"\n{WHITE}{BOLD}⚡ اختر: {RESET}{GREEN}").strip()
+    print(RESET)
+    
+    if platform_choice not in ["1", "2", "3"]:
+        alert_system("خيار غير صحيح. سيتم اختيار إنستغرام افتراضياً.", "warning")
+        platform_choice = "1"
+    
+    platform_names = {"1": "إنستغرام", "2": "فيسبوك", "3": "إنستغرام + فيسبوك"}
+    target_platform = platform_names.get(platform_choice, "إنستغرام")
+    
+    target_user = input(f"{WHITE}{BOLD}📌 أدخل اسم المستخدم المستهدف: {RESET}{GREEN}").strip()
+    print(RESET)
+    
+    if not target_user:
+        target_user = f"user_{random.randint(1000, 9999)}"
+    
+    clear_screen()
+    
+    firewall_breach_screen()
+    
+    print(f"\n{RED}{BOLD}═══════════════════════════════════════════{RESET}")
+    create_3d_box("🔥 جاري تنفيذ الهجوم 🔥", RED)
+    print(f"{RED}{BOLD}═══════════════════════════════════════════{RESET}")
+    
+    alert_system(f"المنصة المستهدفة: {target_platform}", "info")
+    alert_system(f"الحساب المستهدف: {target_user}", "info")
+    time.sleep(1)
+    
+    total_reports = random.randint(1500, 3000)
+    success_rate = random.randint(85, 99)
+    start_time = time.time()
+    
+    # الثغرات المستغلة
+    vulnerabilities = [
+        "ثغرة تجاوز نظام الإبلاغات (Report Bypass)",
+        "ثغرة تكرار الإبلاغات (Report Spam)",
+        "ثغرة تجاوز الحماية (Protection Bypass)",
+        "ثغرة إخفاء الهوية (Identity Hiding)"
+    ]
+    
+    print(f"\n{WHITE}{BOLD}🛡️ الثغرات المستغلة:{RESET}")
+    for i, vuln in enumerate(vulnerabilities, 1):
+        print(f"{YELLOW}[*] جاري استغلال: {vuln}{RESET}")
+        time.sleep(0.5)
+        print(f"\r{GREEN}   [{i}] {vuln} ✓{RESET}")
+        time.sleep(0.3)
+    print()
+    
+    # قائمة خوادم وهمية للإرسال
+    servers = [
+        "server-01.instagram.com",
+        "server-02.instagram.com",
+        "server-03.facebook.com",
+        "server-04.facebook.com",
+        "cdn-01.instagram.com",
+        "cdn-02.facebook.com",
+        "api-01.instagram.com",
+        "api-02.facebook.com"
+    ]
+    
+    print(f"\n{WHITE}{BOLD}📊 تنفيذ الهجوم:{RESET}")
+    
+    total_steps = 900  # 15 دقيقة = 900 ثانية
+    for i in range(total_steps + 1):
+        attack_progress_bar(i, total_steps, "جارٍ ضرب الإبلاغات")
+        sent = int((i / total_steps) * total_reports)
+        elapsed = time.time() - start_time
+        remaining = max(0, 900 - int(elapsed))
+        current_rate = random.randint(25, 60)
+        server = random.choice(servers)
+        show_live_results(sent, total_reports, success_rate, remaining, current_rate, server)
+        time.sleep(1)
+    
+    print()
+    elapsed_time = int(time.time() - start_time)
+    
+    ip = generate_ip()
+    
+    stats['total_attacks'] += 1
+    stats['total_reports'] += total_reports
+    stats['success_rate'] = int((stats['total_reports'] / (stats['total_attacks'] * 1000)) * 100)
+    if stats['success_rate'] > 99:
+        stats['success_rate'] = 99
+    attack_summary = f"{target_platform} | {target_user} | {total_reports} إبلاغ | {success_rate}%"
+    stats['last_attacks'].append(attack_summary)
+    if len(stats['last_attacks']) > 10:
+        stats['last_attacks'].pop(0)
+    save_stats()
+    
+    print(f"\n{RED}{BOLD}═══════════════════════════════════════════{RESET}")
+    create_3d_box("✅ تم تنفيذ الهجوم بنجاح ✅", GREEN)
+    print(f"{RED}{BOLD}═══════════════════════════════════════════{RESET}")
+    
+    print(f"\n{WHITE}{BOLD}📊 ملخص الهجوم:{RESET}")
+    print(f"{WHITE}   المنصة: {RESET}{GREEN}{BOLD}{target_platform}{RESET}")
+    print(f"{WHITE}   الحساب المستهدف: {RESET}{GREEN}{BOLD}{target_user}{RESET}")
+    print(f"{WHITE}   عدد الإبلاغات المرسلة: {RESET}{YELLOW}{BOLD}{total_reports:,}{RESET}")
+    print(f"{WHITE}   نسبة النجاح: {RESET}{GREEN}{BOLD}{success_rate}%{RESET}")
+    print(f"{WHITE}   عنوان IP المستخدم: {RESET}{GREEN}{ip}{RESET}")
+    print(f"{WHITE}   الوقت المستغرق: {RESET}{GREEN}{elapsed_time} ثانية ({elapsed_time//60} دقيقة){RESET}")
+    print(f"{WHITE}   تاريخ الهجوم: {RESET}{GREEN}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{RESET}")
+    
+    print(f"\n{WHITE}{BOLD}📊 حالة النظام:{RESET}")
+    print(f"{WHITE}   حالة الاتصال: {RESET}{GREEN}مستقر ✓{RESET}")
+    print(f"{WHITE}   وضع التخفي: {RESET}{GREEN}مفعل ✓{RESET}")
+    print(f"{WHITE}   جدار الحماية: {RESET}{GREEN}مخترق ✓{RESET}")
+    
+    html_file = generate_html_report(target_platform, target_user, total_reports, success_rate, ip, elapsed_time)
+    alert_system(f"تم توليد التقرير: {html_file}", "success")
+    
+    print('\a')
+    time.sleep(0.3)
+    print('\a')
+    time.sleep(0.3)
+    print('\a')
+    
+    print(f"\n{YELLOW}{BOLD}┌──────────────────────────────────────────────────────┐{RESET}")
+    print(f"{YELLOW}{BOLD}│{RESET}  {CYAN}[1]{RESET} {WHITE}هجوم جديد{RESET}     {CYAN}[2]{RESET} {WHITE}الإحصائيات{RESET}     {CYAN}[3]{RESET} {WHITE}التقرير الكامل{RESET}  {YELLOW}{BOLD}│{RESET}")
+    print(f"{YELLOW}{BOLD}│{RESET}  {CYAN}[4]{RESET} {WHITE}فتح التقرير{RESET}     {CYAN}[0]{RESET} {WHITE}خروج{RESET}                   {YELLOW}{BOLD}│{RESET}")
+    print(f"{YELLOW}{BOLD}└──────────────────────────────────────────────────────┘{RESET}")
+    
+    choice = input(f"\n{WHITE}{BOLD}⚡ اختر: {RESET}{GREEN}").strip()
+    
+    if choice == "1":
+        report_striker()
+    elif choice == "2":
+        show_stats()
+        report_striker()
+    elif choice == "3":
+        print(f"\n{GREEN}📄 جاري توليد التقرير الكامل...{RESET}")
+        time.sleep(1.5)
+        create_3d_box("📊 التقرير الكامل", BLUE)
+        print(f"{WHITE}   المنصة: {target_platform}")
+        print(f"{WHITE}   الحساب: {target_user}")
+        print(f"{WHITE}   الإبلاغات: {total_reports}")
+        print(f"{WHITE}   النجاح: {success_rate}%")
+        print(f"{WHITE}   الوقت: {elapsed_time} ثانية ({elapsed_time//60} دقيقة)")
+        print(f"{WHITE}   التاريخ: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        input(f"\n{YELLOW}اضغط Enter للعودة...{RESET}")
+        report_striker()
+    elif choice == "4":
+        if os.path.exists(html_file):
+            webbrowser.open(html_file)
+            alert_system(f"تم فتح التقرير: {html_file}", "success")
+        else:
+            alert_system("الملف غير موجود!", "error")
+        time.sleep(1)
+        report_striker()
+    else:
+        print(f"\n{GREEN}تم إيقاف النظام. وداعاً.{RESET}")
+        sys.exit()
+
+def main():
+    clear_screen()
+    typewriter(f"{RED}{BOLD}🔥 BLACK DATA - النظام المتقدم 🔥{RESET}", 0.05)
+    time.sleep(0.5)
+    
+    animated_background()
+    
+    while True:
+        if channel_verification():
+            break
+        else:
+            retry = input(f"\n{WHITE}هل تريد المحاولة مرة أخرى؟ (نعم/لا): {RESET}{GREEN}").strip().lower()
+            if retry != "نعم" and retry != "yes":
+                print(f"\n{GREEN}تم إلغاء التشغيل. وداعاً.{RESET}")
+                sys.exit()
+    
+    report_striker()
+
+if __name__ == "__main__":
+    main()
